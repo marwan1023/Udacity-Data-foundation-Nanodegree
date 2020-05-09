@@ -1,0 +1,8 @@
+Name,COUNT(Track.TrackId)
+Rock,157
+Latin,91
+Metal,64
+Alternative & Punk,50
+Jazz,22
+Blues,15
+TV Shows,14

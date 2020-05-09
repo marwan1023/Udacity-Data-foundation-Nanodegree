@@ -1,0 +1,127 @@
+/*Query for the first question
+find out what’s the most popular music genre sold I joined Track 
+ontoInvoiceLine using the primary key TrackId and did a count of 
+number of tracks sold based on genre*/
+
+SELECT Genre.Name Genre_name, COUNT(Genre.Name) NumTracks
+FROM InvoiceLine 
+JOIN Track 
+ON InvoiceLine.TrackId = Track.TrackId
+JOIN Genre 
+ON Track.GenreId = Genre.GenreId
+GROUP BY Genre_name
+ORDER BY NumTracks DESC
+limit 10;
+
+
+/*Query for the second question
+find which artist has earned the most according to the InvoiceLines?
+Now use this artist to find which customer spent the most on this artist.
+For this query, you will need to use the Invoice, InvoiceLine, Track, 
+Customer, Album, and Artist tables.*/
+
+
+SELECT Artist.Name AS Artist_Name , sum(InvoiceLine.UnitPrice*InvoiceLine.Quantity)AS Song_Cost
+FROM Invoice 
+JOIN InvoiceLine
+ON Invoice.invoiceId = InvoiceLine.InvoiceId
+Join Customer
+On Invoice.CustomerId = Customer.CustomerId
+JOIN Track
+ON Track.trackId = InvoiceLine.TrackId
+JOIN Album
+ON Album.AlbumId= Track.AlbumId
+JOIN Artist
+ON Artist.ArtistId= Album.ArtistId
+GROUP BY Artist.Name
+order by Song_cost desc
+LIMIT 10
+
+
+/*Query for the third question
+
+find Which country's customers spent the most?*/
+
+select  * from 
+(select Customer.Country, sum(Invoice.Total) as salesTotal
+from Employee, Invoice , Customer
+where Employee.EmployeeId= Customer.SupportRepId
+and Customer.CustomerId= Invoice.CustomerId
+group by Customer.Country) 
+order by salesTotal desc Limit 7;
+
+
+
+/*Query for the fourth question
+/*What are the top 7 genres in the US?*/
+
+
+SELECT Genre.Name, COUNT(Track.TrackId) FROM Track
+JOIN Genre
+ON Track.GenreId = Genre.GenreId
+JOIN InvoiceLine 
+ON Track.TrackId = InvoiceLine.TrackId
+JOIN Invoice
+ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+WHERE Invoice.BillingCountry = "USA"
+GROUP BY Genre.GenreId
+ORDER BY COUNT(Track.TrackId) DESC 
+LIMIT 7;
+
+
+/*Query for the Fifth question
+Provide a query that shows the most purchased Media Type.*/
+
+SELECT
+MediaType.Name AS MediaType,
+COUNT(InvoiceLine.InvoiceLineId) AS TotalPurchases
+FROM Track 
+JOIN InvoiceLine 
+ ON Track.TrackId = InvoiceLine.TrackId
+JOIN Invoice 
+ ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+JOIN MediaType 
+ ON Track.MediaTypeId = MediaType.MediaTypeId
+GROUP BY MediaType.Name
+
+
+
+/*  MAX(TotalPurchases)*/
+
+SELECT
+MediaType,
+MAX(TotalPurchases)
+FROM
+
+(SELECT
+MediaType.Name AS MediaType,
+COUNT(InvoiceLine.InvoiceLineId) AS TotalPurchases
+FROM Track 
+JOIN InvoiceLine 
+ ON Track.TrackId = InvoiceLine.TrackId
+JOIN Invoice 
+ ON InvoiceLine.InvoiceId = Invoice.InvoiceId
+JOIN MediaType 
+ ON Track.MediaTypeId = MediaType.MediaTypeId
+GROUP BY MediaType.Name)
+
+
+
+/*Query for the sixty question
+/*Provide a query that shows the album id, album title,
+ maximum length, minimum length,
+ of tracks in the tracks table.*/
+
+
+SELECT
+ Track.albumid,Track.Name,Track.Milliseconds,
+ Min(Milliseconds),
+ Max(Milliseconds)
+FROM Track
+JOIN Album 
+ON Album.albumid = Track.albumid
+GROUP BY Track.albumid
+order by Max(Milliseconds),Min(Milliseconds) desc 
+limit 15;
+
+

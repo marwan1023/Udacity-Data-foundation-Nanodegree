@@ -1,0 +1,115 @@
+select name,milliseconds from Track
+where milliseconds> (select avg(milliseconds) from Track)
+group by name;
+
+Question 1: Which countries have the most Invoices?
+Use the Invoice table to determine the countries that have the most invoices.
+Provide a table of BillingCountry and Invoices ordered by the number of i
+nvoices for each country. The country with the most invoices should appear first.
+
+select BillingCountry, Count(BillingCountry) from invoice
+group by BillingCountry
+order by Count(BillingCountry) desc
+
+Question 2: Which city has the best customers?
+We would like to throw a promotional Music Festival in the city we made the most money. 
+Write a query that returns the 1 city that has the highest sum of invoice totals. 
+Return both the city name and the sum of all invoice totals
+
+SELECT c.city, SUM(i.Total) as Invoices
+FROM Customer c
+JOIN Invoice i
+ON i.customerId = c.customerId
+GROUP by c.city
+ORDER by invoices desc
+LIMIT 7
+
+Question 3: Who is the best customer?
+The customer who has spent the most money will be declared the best customer.
+Build a query that returns the person who has spent the most money. 
+I found the solution by linking the following three: Invoice, InvoiceLine,
+and Customer tables to retrieve this information, but you can probably do it with fewer!
+
+SELECT invoice.customerID, SUM(invoice.total) as invoices
+FROM invoice
+GROUP BY Customerid
+ORDER BY invoices DESC
+LIMIT 1;
+
+
+Question 1
+Use your query to return the email, first name, last name,
+ and Genre of all Rock Music listeners. 
+Return your list ordered alphabetically by email address starting with A.
+I chose to link information from the Customer, Invoice, InvoiceLine, 
+Track, and Genre tables, but you may be able to find another way to get at the information.
+
+Select c.email, c.firstname, c.lastname, g.name
+From customer c
+Join invoice i
+on c.customerid = i.customerid
+Join invoiceline L
+on i.invoiceid = L.invoiceid
+Join track t
+on l.invoiceid = t.trackid
+join genre g
+on g.genreid = t.genreid
+where g.name = "Rock"
+group by 1
+order by 1;
+
+Question 2: Who is writing the rock music?
+Now that we know that our customers love rock music, 
+we can decide which musicians to invite to play at the concert.
+Let's invite the artists who have written the most rock music in our dataset.
+ Write a query that returns the Artist name and total track count of the top 10 rock bands.
+You will need to use the Genre, Track , Album, and Artist tables.
+
+SELECT a.Name, COUNT(t.TrackId) songs
+FROM Artist a
+JOIN Album al
+ON a.ArtistId = al.ArtistId
+JOIN Track t
+ON al.AlbumId = t.AlbumId
+JOIN Genre g
+ON t.GenreId = g.GenreId
+WHERE g.Name LIKE 'Rock'
+GROUP BY a.Name
+ORDER BY songs DESC
+LIMIT 10
+
+Question 3
+First, find which artist has earned the most according to the InvoiceLines?
+Now use this artist to find which customer spent the most on this artist.
+For this query, you will need to use the Invoice, InvoiceLine, Track, Customer, Album, and Artist tables.
+
+SELECT Artist.Name, SUM(InvoiceLine.UnitPrice*InvoiceLine.Quantity) AmountSpent
+FROM Artist
+JOIN Album ON Artist.ArtistId=Album.ArtistId
+JOIN Track ON Album.AlbumId=Track.TrackId
+JOIN InvoiceLine ON Track.TrackId=InvoiceLine.TrackId
+JOIN Invoice ON InvoiceLine.InvoiceID=Invoice.InvoiceId
+JOIN Customer ON Invoice.CustomerId=Customer.CustomerId
+GROUP BY 1
+ORDER BY 2 DESC;
+
+
+Then, the top purchasers are shown in the table below.
+ The customer with the highest total invoice amount is customer 55, Mark Taylor.
+
+SELECT a.name, a.artistid, c.customerid, c.firstname, c.lastname,
+ SUM(il.unitprice*quantity) AS total_earned
+FROM artist a
+JOIN album al
+ON al.artistid = a.artistid
+JOIN track t
+ON al.albumid = t.albumid
+JOIN invoiceline il
+ON t.trackid = il.trackid
+JOIN invoice i
+ON i.invoiceid = il.invoiceid
+JOIN customer c
+ON c.customerid = i.customerid
+WHERE a.name = 'Iron Maiden'
+GROUP BY c.customerid
+ORDER BY total_earned DESC;
